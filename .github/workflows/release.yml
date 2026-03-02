@@ -71,7 +71,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./dockerfiles/Dockerfile # 指定Dockerfile路径
+          file: ./Dockerfile # 指定Dockerfile路径
           push: true
           platforms: linux/amd64
           tags: |

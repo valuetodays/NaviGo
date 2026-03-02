@@ -11,7 +11,9 @@
 - 🌐 **跨平台**：支持Linux/Windows/macOS
 
 ## 🚀 快速部署（Docker Compose）
+
 ### 1. 创建docker-compose.yml
+
 ```yaml
 version: '3'
 services:
@@ -22,32 +24,7 @@ services:
       - "80:3000"  # 主机80端口映射到容器3000端口
     volumes:
       - ./navigo.db:/app/navigo.db  # 挂载数据库文件到宿主机
-    restart: always  # 开机自启
-    # NaviGo
-轻量、可靠、团队友好的内部网址导航系统（Go + SQLite）。
-
-## ✨ 核心特性
-- 🚀 **纯Go实现**：自带HTML页面服务，无需Nginx/Apache
-- 📦 **SQLite数据库**：单文件存储，备份/迁移超简单
-- 👥 **团队协作**：单用户账号，登录可编辑，游客仅查看
-- 🐳 **Docker部署**：一键启动，仅需挂载数据库文件
-- 📉 **极低资源占用**：内存仅10-20MB，适合低配服务器
-- 🌐 **跨平台**：支持Linux/Windows/macOS
-
-## 🚀 快速部署（Docker Compose）
-
-### 1. 创建docker-compose.yml
-```yaml
-version: '3'
-services:
-  navigo:
-    image: 你的Docker用户名/navigo:latest
-    container_name: navigo
-    ports:
-      - "80:3000"  # 主机80端口映射到容器3000端口
-    volumes:
-      - ./navigo.db:/app/navigo.db  # 挂载数据库文件到宿主机
-    restart: always  # 开机自启
+    restart: unless-stopped  # 开机自启
 ```
 
 #### 2. 启动服务
