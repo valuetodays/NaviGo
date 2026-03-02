@@ -1,0 +1,63 @@
+name: Release NaviGo
+
+on:
+  push:
+    tags:
+      - 'v*'  # 推送v开头的tag时触发（如v1.0.0）
+
+jobs:
+  # 构建多平台二进制文件
+  build-binaries:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 配置Go环境
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache: true
+
+      - name: 构建二进制文件
+        run: |
+          # Linux AMD64
+          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o navigo-linux-amd64 main.go
+          # Windows AMD64
+          CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o navigo-windows-amd64.exe main.go
+          # macOS AMD64
+          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o navigo-darwin-amd64 main.go
+
+      - name: 上传到GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            navigo-linux-amd64
+            navigo-windows-amd64.exe
+            navigo-darwin-amd64
+
+  # 构建并推送Docker镜像
+  build-docker:
+    runs-on: ubuntu-latest
+    needs: build-binaries  # 依赖二进制构建完成
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 配置Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 登录Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}  # GitHub Secrets里的Docker用户名
+          password: ${{ secrets.DOCKER_TOKEN }}     # GitHub Secrets里的Docker Token
+
+      - name: 构建并推送镜像
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/navigo:latest
+            ${{ secrets.DOCKER_USERNAME }}/navigo:${{ github.ref_name }}
