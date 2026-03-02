@@ -1,6 +1,9 @@
 # 构建阶段
 FROM golang:1.23.4-alpine3.20 AS builder
 
+# 安装 gcc + libc-dev
+RUN apk add --no-cache gcc musl-dev
+
 # 设置工作目录
 WORKDIR /app
 
