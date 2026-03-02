@@ -23,7 +23,7 @@ services:
     ports:
       - "80:3000"  # 主机80端口映射到容器3000端口
     volumes:
-      - ./navigo.db:/app/navigo.db  # 挂载数据库文件到宿主机
+      - ./data:/app/data  # 挂载数据库文件到宿主机
     restart: unless-stopped  # 开机自启
 ```
 
