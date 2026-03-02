@@ -6,6 +6,7 @@ import (
 	"embed"
 	"net/http"
 	"strconv"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
