@@ -2,6 +2,8 @@ package main
 
 import (
 	"os"
+	"time"
+	"fmt"
 	"database/sql"
 	"embed"
 	"net/http"
@@ -33,11 +35,13 @@ type Link struct {
 	URL  string `json:"url"`
 }
 
+var dbFile = "./data/navigo.db"
+
 // 初始化数据库（自动建表+默认用户）
 func initDB() {
 	var err error
 	// 连接SQLite数据库（文件：navigo.db）
-	db, err = sql.Open("sqlite3", "./data/navigo.db")
+	db, err = sql.Open("sqlite3", dbFile)
 	if err != nil {
 		panic("数据库连接失败：" + err.Error())
 	}
@@ -134,6 +138,17 @@ func main() {
 			return
 		}
 		c.Data(http.StatusOK, "text/html; charset=utf-8", data)
+	})
+
+	// 在 main.go 或 router 初始化时添加
+	r.GET("/download", func(c *gin.Context) {
+		// 获取当前时间
+		now := time.Now()
+		fileName := now.Format("20060102--15-04-05") + ".db"
+
+		// 设置下载头
+		c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, fileName))
+		c.File(dbFile)  // 指向容器里的 db 文件
 	})
 
 	// ========== API接口 ==========

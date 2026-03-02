@@ -337,13 +337,7 @@
         }
 
         function downloadDB() {
-            // 直接下载同目录 navigo.db
-            const a = document.createElement("a");
-            a.href = "navigo.db";
-            a.download = "navigo.db";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            window.open("/download", "_blank");
         }
 
         async function addGroup() {
