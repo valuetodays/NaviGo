@@ -18,7 +18,7 @@
 version: '3'
 services:
   navigo:
-    image: 你的Docker用户名/navigo:latest
+    image: 193002818/navigo:latest
     container_name: navigo
     ports:
       - "80:3000"  # 主机80端口映射到容器3000端口

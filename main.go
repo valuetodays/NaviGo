@@ -35,7 +35,7 @@ type Link struct {
 func initDB() {
 	var err error
 	// 连接SQLite数据库（文件：navigo.db）
-	db, err = sql.Open("sqlite3", "./navigo.db")
+	db, err = sql.Open("sqlite3", "/app/navigo.db")
 	if err != nil {
 		panic("数据库连接失败：" + err.Error())
 	}
