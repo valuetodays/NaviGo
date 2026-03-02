@@ -24,7 +24,10 @@ services:
       - "80:3000"  # 主机80端口映射到容器3000端口
     volumes:
       - ./data:/app/data  # 挂载数据库文件到宿主机
-    restart: unless-stopped  # 开机自启
+    environment:
+      NAVIGO_USER: "team"
+      NAVIGO_PASS: "abc123456"
+    restart: unless-stopped
 ```
 
 #### 2. 启动服务

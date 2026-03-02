@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"database/sql"
 	"embed"
 	"net/http"
@@ -71,6 +72,22 @@ func initDB() {
 		panic("创建链接表失败：" + err.Error())
 	}
 
+	// 获取环境变量，提供默认值
+	username := os.Getenv("NAVIGO_USER")
+	if username == "" {
+		username = "team"
+	}
+
+	rawPassword := os.Getenv("NAVIGO_PASS")
+	if rawPassword == "" {
+		rawPassword = "a123456"
+	}
+
+	// bcrypt 加密
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(rawPassword), bcrypt.DefaultCost)
+	if err != nil {
+		panic("密码加密失败：" + err.Error())
+	}
 	// 初始化默认用户（仅第一次运行）
 	var count int
 	err = db.QueryRow("SELECT COUNT(*) FROM users").Scan(&count)
@@ -78,7 +95,7 @@ func initDB() {
 		panic("查询用户数失败：" + err.Error())
 	}
 	if count == 0 {
-		_, err = db.Exec("INSERT INTO users (id, username, password) VALUES (1, 'team', '123456')")
+    	_, err = db.Exec("INSERT INTO users (id, username, password) VALUES (1, ?, ?)", username, hashedPassword)
 		if err != nil {
 			panic("初始化默认用户失败：" + err.Error())
 		}
@@ -132,9 +149,12 @@ func main() {
 			return
 		}
 
-		var password string
-		err := db.QueryRow("SELECT password FROM users WHERE username=?", req.Username).Scan(&password)
-		if err != nil || password != req.Password {
+		var hashedPassword string
+		err := db.QueryRow("SELECT password FROM users WHERE username=?", req.Username).Scan(&hashedPassword )
+		// 使用 bcrypt 验证密码
+		err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(req.Password))
+		if err != nil {
+			// 密码不匹配
 			c.JSON(http.StatusOK, gin.H{"msg": "账号或密码错误"})
 			return
 		}
